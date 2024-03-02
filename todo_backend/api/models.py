@@ -1,12 +1,19 @@
 from django.db import models
 
 class Todo(models.Model):
-  body = models.TextField()
-  updated = models.DateTimeField(auto_now=True)
-  created = models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICES = (
+        ('todo', 'Todo'),
+        ('completed', 'Completed'),
+    )
+    
+    title = models.CharField(max_length=100, default='')
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='todo')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
 
-  def __str__(self):
-      return self.body[:50]
-  
-  class Meta:
-    ordering = ['-updated']
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        ordering = ['-updated']
