@@ -5,72 +5,80 @@ from .models import Todo
 
 @api_view(["GET"])
 def getRoutes(request):
-  routes = [
-    {
-      'Endpoint': '/todos/',
-      'method': 'GET',
-      'body': 'None',
-      'description': 'Returns an array of notes'
-    },
-    {
-      'Endpoint': '/todos/id',
-      'method': 'GET',
-      'body': 'None',
-      'description': 'Returns single todo object'
-    },
-    {
-      'Endpoint': '/todos/create/',
-      'method': 'POST',
-      'body': {'body': ""},
-      'description': 'Create new todo'
-    },
-    {
-      'Endpoint': '/todos/id/update/',
-      'method': 'PUT',
-      'body': {'body': ""},
-      'description': 'Update todo'
-    },
-    {
-      'Endpoint': '/todos/id/delete/',
-      'method': 'DELETEU',
-      'body': 'None',
-      'description': 'Delete todo'
-    },
-  ]
-  return Response(routes)
+    routes = [
+        {
+            'Endpoint': '/todos/',
+            'method': 'GET',
+            'body': 'None',
+            'description': 'Returns a list of todo items'
+        },
+        {
+            'Endpoint': '/todos/<int:pk>/',
+            'method': 'GET',
+            'body': 'None',
+            'description': 'Returns a single todo item by id'
+        },
+        {
+            'Endpoint': '/todos/create/',
+            'method': 'POST',
+            'body': {'title': "", 'description': "", 'status': ""},
+            'description': 'Create a new todo item'
+        },
+        {
+            'Endpoint': '/todos/<int:pk>/update/',
+            'method': 'PUT',
+            'body': {'title': "", 'description': "", 'status': ""},
+            'description': 'Update an existing todo item by id'
+        },
+        {
+            'Endpoint': '/todos/<int:pk>/delete/',
+            'method': 'DELETE',
+            'body': 'None',
+            'description': 'Delete a todo item by id'
+        },
+    ]
+    return Response(routes)
 
 @api_view(['GET'])
 def getTodos(request):
-  todo = Todo.objects.all()
-  serializer = TodoSerializer(todo, many=True)
-  return Response(serializer.data)
+    todos = Todo.objects.all()
+    serializer = TodoSerializer(todos, many=True)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def getTodo(request, pk):
-  todo = Todo.objects.get(id=pk)
-  serializer = TodoSerializer(todo, many=False)
-  return Response(serializer.data)
+    try:
+        todo = Todo.objects.get(id=pk)
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo item does not exist"}, status=404)
 
 @api_view(['POST'])
 def createTodo(request):
-  data = request.data
-  todo = Todo.objects.create(
-    body = data['body']
-  )
-  serializer = TodoSerializer(todo, many=False)
-  return Response(serializer.data)
+    serializer = TodoSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=201)
+    return Response(serializer.errors, status=400)
 
 @api_view(['PUT'])
 def updateTodo(request, pk):
-  data = request.data
-  todo = Todo.objects.get(id=pk)
-  serializer = TodoSerializer(todo, data=data)
-  if serializer.is_valid():
-    serializer.save()
-  return Response(serializer.data)
+    try:
+        todo = Todo.objects.get(id=pk)
+        serializer = TodoSerializer(todo, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo item does not exist"}, status=404)
 
 @api_view(['DELETE'])
 def deleteTodo(request, pk):
-  todo = Todo.objects.get(id=pk)
-  todo.delete()
-  return Response({"message": "Deleted successfully!"})
+    try:
+        todo = Todo.objects.get(id=pk)
+        todo.delete()
+        return Response({"message": "Todo item deleted successfully"}, status=204)
+    except Todo.DoesNotExist:
+        return Response({"error": "Todo item does not exist"}, status=404)
