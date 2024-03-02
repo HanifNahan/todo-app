@@ -42,7 +42,6 @@ def getRoutes(request):
 @api_view(['GET'])
 def getTodos(request):
   todo = Todo.objects.all()
-  print("hello")
   serializer = TodoSerializer(todo, many=True)
   return Response(serializer.data)
 
