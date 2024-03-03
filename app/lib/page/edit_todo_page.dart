@@ -1,3 +1,4 @@
+import 'package:app/component/button/button_primary.dart';
 import 'package:app/page/add_todo_page.dart';
 import 'package:app/component/todo.dart';
 import 'package:app/support/api.dart';
@@ -67,20 +68,12 @@ class _EditTodoPageState extends State<EditTodoPage> {
       final response =
           await API().put('todos/${widget.todo.id}/update/', todoData);
       if (response['status']) {
-        Navigator.pop(context, true);
+        back();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to update todo: ${response.body}'),
-          ),
-        );
+        _showSnackBar('Failed to create todo: ${response['data'].toString()}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to create todo: ${e.toString()}'),
-        ),
-      );
+      _showSnackBar('Failed to create todo: ${e.toString()}');
     }
   }
 
@@ -89,21 +82,25 @@ class _EditTodoPageState extends State<EditTodoPage> {
       final response = await API().delete('todos/${widget.todo.id}/delete/');
 
       if (response['status']) {
-        Navigator.pop(context, true);
+        back();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to delete todo'),
-          ),
-        );
+        _showSnackBar('Failed to create todo');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete todo: ${e.toString()}'),
-        ),
-      );
+      _showSnackBar('Failed to create todo: ${e.toString()}');
     }
+  }
+
+  void back() {
+    Navigator.pop(context, true);
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -112,77 +109,87 @@ class _EditTodoPageState extends State<EditTodoPage> {
       appBar: AppBar(
         title: const Text('Edit Todo'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Title',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Title',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter title',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Description',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter description',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: null,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Status',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButton<TodoStatus>(
+                    value: _selectedStatus,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedStatus = newValue!;
+                      });
+                    },
+                    items: TodoStatus.values.map((status) {
+                      return DropdownMenuItem<TodoStatus>(
+                        value: status,
+                        child: Text(status.toString().split('.').last),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                hintText: 'Enter title',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Description',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                hintText: 'Enter description',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: null,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Status',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButton<TodoStatus>(
-              value: _selectedStatus,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedStatus = newValue!;
-                });
-              },
-              items: TodoStatus.values.map((status) {
-                return DropdownMenuItem<TodoStatus>(
-                  value: status,
-                  child: Text(status.toString().split('.').last),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                ElevatedButton(
+                ButtonPrimary(
                   onPressed: () {
                     _updateTodo();
                   },
                   child: const Text('Update Todo'),
                 ),
-                ElevatedButton(
+                const SizedBox(height: 8),
+                ButtonPrimary(
+                  bgColor: Colors.red,
                   onPressed: () {
                     _deleteTodo();
                   },
@@ -190,8 +197,8 @@ class _EditTodoPageState extends State<EditTodoPage> {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

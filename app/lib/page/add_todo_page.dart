@@ -1,3 +1,4 @@
+import 'package:app/component/button/button_primary.dart';
 import 'package:app/component/text_input.dart';
 import 'package:app/support/api.dart';
 import 'package:flutter/material.dart';
@@ -41,21 +42,25 @@ class _AddTodoPageState extends State<AddTodoPage> {
 
       final response = await API().post('todos/create/', todoData);
       if (response['status']) {
-        Navigator.pop(context, true);
+        back();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create todo: ${response.body}'),
-          ),
-        );
+        _showSnackBar('Failed to create todo: ${response['data'].toString()}');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to create todo: ${e.toString()}'),
-        ),
-      );
+      _showSnackBar('Failed to create todo: ${e.toString()}');
     }
+  }
+
+  void back() {
+    Navigator.pop(context, true);
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -117,10 +122,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     selectedStatus = newValue!;
                   });
                 },
-                underline: Container(), // Remove the underline
-                icon: const Icon(Icons.arrow_drop_down), // Custom dropdown icon
-                style: const TextStyle(
-                    color: Colors.black), // Custom dropdown text style
+                underline: Container(),
+                icon: const Icon(Icons.arrow_drop_down),
+                style: const TextStyle(color: Colors.black),
                 items: TodoStatus.values.map((status) {
                   return DropdownMenuItem<TodoStatus>(
                     value: status,
@@ -135,16 +139,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
+              child: ButtonPrimary(
                 onPressed: () {
                   _createTodo();
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
                 child: const Text('Save Todo'),
               ),
             ),
