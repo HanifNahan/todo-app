@@ -89,7 +89,7 @@ class _EditTodoPageState extends State<EditTodoPage> {
       final response = await API().delete('todos/${widget.todo.id}/delete/');
 
       if (response['status']) {
-        Navigator.pop(context, true); // Navigate back if delete successful
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
