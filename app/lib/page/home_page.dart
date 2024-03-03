@@ -73,13 +73,12 @@ class _HomePageState extends State<HomePage> {
                   elevation: 4,
                   margin: const EdgeInsets.all(8),
                   child: Padding(
-                    padding: const EdgeInsets.all(12), // Reduced padding
+                    padding: const EdgeInsets.all(12),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          flex:
-                              4, // Adjusted flex to make the left content take up more space
+                          flex: 4,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -90,12 +89,12 @@ class _HomePageState extends State<HomePage> {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 4), // Reduced spacing
+                              const SizedBox(height: 4),
                               Text(
                                 todo.description,
                                 style: TextStyle(color: Colors.grey[700]),
                               ),
-                              const SizedBox(height: 4), // Reduced spacing
+                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   const Text(
@@ -107,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 8,
-                                      vertical: 2, // Reduced vertical padding
+                                      vertical: 2,
                                     ),
                                     decoration: BoxDecoration(
                                       color: todo.status == 'todo'
@@ -157,8 +156,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Expanded(
-                          flex:
-                              1, // Adjusted flex to make the IconButton take up less space
+                          flex: 1,
                           child: IconButton(
                             onPressed: () {
                               Navigator.push(
