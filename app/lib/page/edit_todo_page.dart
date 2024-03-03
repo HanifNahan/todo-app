@@ -88,14 +88,19 @@ class _EditTodoPageState extends State<EditTodoPage> {
     final response = await http.delete(
       Uri.parse('http://127.0.0.1:8000/todos/${widget.todo.id}/delete/'),
     );
-    print(jsonDecode(response.body));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 204) {
       Navigator.pop(context, true);
+    } else if (response.statusCode == 404) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Todo item does not exist'),
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to delete todo: ${response.body}'),
+        const SnackBar(
+          content: Text('Failed to delete todo'),
         ),
       );
     }
