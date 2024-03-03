@@ -1,8 +1,6 @@
-import 'dart:convert';
-
 import 'package:app/component/text_input.dart';
+import 'package:app/support/api.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 enum TodoStatus {
   todo,
@@ -22,41 +20,39 @@ class _AddTodoPageState extends State<AddTodoPage> {
   TodoStatus selectedStatus = TodoStatus.todo;
 
   Future<void> _createTodo() async {
-    final String title = titleController.text.trim();
-    final String description = descriptionController.text.trim();
+    try {
+      final String title = titleController.text.trim();
+      final String description = descriptionController.text.trim();
 
-    if (title.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Title or description cannot be empty'),
-        ),
-      );
-      return;
-    }
+      if (title.isEmpty || description.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Title or description cannot be empty'),
+          ),
+        );
+        return;
+      }
 
-    final Map<String, dynamic> todoData = {
-      'title': title,
-      'description': description,
-      'status': selectedStatus
-          .toString()
-          .split('.')
-          .last, // Convert enum value to string
-    };
+      final Map<String, dynamic> todoData = {
+        'title': title,
+        'description': description,
+        'status': selectedStatus.toString().split('.').last,
+      };
 
-    final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/todos/create/'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(todoData),
-    );
-
-    if (response.statusCode == 201) {
-      Navigator.pop(context, true);
-    } else {
+      final response = await API().post('todos/create/', todoData);
+      if (response['status']) {
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to create todo: ${response.body}'),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to create todo: ${response.body}'),
+          content: Text('Failed to create todo: ${e.toString()}'),
         ),
       );
     }

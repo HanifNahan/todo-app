@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'package:app/page/add_todo_page.dart';
-import 'package:app/page/edit_todo_page.dart'; // Import the edit todo page
+import 'package:app/page/edit_todo_page.dart';
 import 'package:app/component/todo.dart';
+import 'package:app/support/api.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,21 +22,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Todo>> fetchTodos() async {
-    final response = await http.get(Uri.parse('http://127.0.0.1:8000/todos/'));
-    if (response.statusCode == 200) {
-      final List<dynamic> jsonData = jsonDecode(response.body);
-      return jsonData
-          .map((json) => Todo(
-                id: json['id'],
-                title: json['title'],
-                description: json['description'],
-                status: json['status'],
-                created: DateTime.parse(json['created']),
-                updated: DateTime.parse(json['updated']),
-              ))
-          .toList();
-    } else {
-      throw Exception('Failed to load todos');
+    try {
+      final response = await API().get('todos/');
+      if (response['status']) {
+        final List<dynamic> jsonData = response['data'];
+        return jsonData
+            .map((json) => Todo(
+                  id: json['id'],
+                  title: json['title'],
+                  description: json['description'],
+                  status: json['status'],
+                  created: DateTime.parse(json['created']),
+                  updated: DateTime.parse(json['updated']),
+                ))
+            .toList();
+      } else {
+        throw Exception('Failed to load todos');
+      }
+    } catch (e) {
+      throw Exception(e.toString());
     }
   }
 
@@ -68,14 +71,12 @@ class _HomePageState extends State<HomePage> {
                     DateFormat.yMd().add_Hms().format(todo.updated);
                 return GestureDetector(
                   onTap: () {
-                    // Navigate to edit todo page when tapped
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => EditTodoPage(todo: todo),
                       ),
                     ).then((value) {
-                      // Refresh todo list if necessary after editing
                       if (value == true) {
                         setState(() {
                           _todos = fetchTodos();

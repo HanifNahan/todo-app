@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 import 'package:app/page/add_todo_page.dart';
 import 'package:app/component/todo.dart';
+import 'package:app/support/api.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class EditTodoPage extends StatefulWidget {
   final Todo todo;
@@ -46,61 +44,63 @@ class _EditTodoPageState extends State<EditTodoPage> {
   }
 
   Future<void> _updateTodo() async {
-    final String title = _titleController.text.trim();
-    final String description = _descriptionController.text.trim();
+    try {
+      final String title = _titleController.text.trim();
+      final String description = _descriptionController.text.trim();
 
-    if (title.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Title or description cannot be empty'),
-        ),
-      );
-      return;
-    }
+      if (title.isEmpty || description.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Title or description cannot be empty'),
+          ),
+        );
+        return;
+      }
 
-    final Map<String, dynamic> todoData = {
-      'id': widget.todo.id,
-      'title': title,
-      'description': description,
-      'status': _selectedStatus.toString().split('.').last,
-    };
+      final Map<String, dynamic> todoData = {
+        'id': widget.todo.id,
+        'title': title,
+        'description': description,
+        'status': _selectedStatus.toString().split('.').last,
+      };
 
-    final response = await http.put(
-      Uri.parse('http://127.0.0.1:8000/todos/${widget.todo.id}/update/'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode(todoData),
-    );
-
-    if (response.statusCode == 200) {
-      Navigator.pop(context, true);
-    } else {
+      final response =
+          await API().put('todos/${widget.todo.id}/update/', todoData);
+      if (response['status']) {
+        Navigator.pop(context, true);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update todo: ${response.body}'),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update todo: ${response.body}'),
+          content: Text('Failed to create todo: ${e.toString()}'),
         ),
       );
     }
   }
 
   Future<void> _deleteTodo() async {
-    final response = await http.delete(
-      Uri.parse('http://127.0.0.1:8000/todos/${widget.todo.id}/delete/'),
-    );
+    try {
+      final response = await API().delete('todos/${widget.todo.id}/delete/');
 
-    if (response.statusCode == 204) {
-      Navigator.pop(context, true);
-    } else if (response.statusCode == 404) {
+      if (response['status']) {
+        Navigator.pop(context, true); // Navigate back if delete successful
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to delete todo'),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Todo item does not exist'),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Failed to delete todo'),
+        SnackBar(
+          content: Text('Failed to delete todo: ${e.toString()}'),
         ),
       );
     }
