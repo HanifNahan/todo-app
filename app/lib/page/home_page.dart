@@ -66,47 +66,120 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 final todo = todos[index];
                 final createdFormatted =
-                    DateFormat.yMd().add_Hms().format(todo.created);
+                    DateFormat('MMM dd, yyyy').add_jm().format(todo.created);
                 final updatedFormatted =
-                    DateFormat.yMd().add_Hms().format(todo.updated);
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditTodoPage(todo: todo),
-                      ),
-                    ).then((value) {
-                      if (value == true) {
-                        setState(() {
-                          _todos = fetchTodos();
-                        });
-                      }
-                    });
-                  },
-                  child: Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.all(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            todo.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                    DateFormat('MMM dd, yyyy').add_jm().format(todo.updated);
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.all(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12), // Reduced padding
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          flex:
+                              4, // Adjusted flex to make the left content take up more space
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                todo.title,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4), // Reduced spacing
+                              Text(
+                                todo.description,
+                                style: TextStyle(color: Colors.grey[700]),
+                              ),
+                              const SizedBox(height: 4), // Reduced spacing
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Status:',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2, // Reduced vertical padding
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: todo.status == 'todo'
+                                          ? Colors.orange
+                                          : Colors.green,
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Text(
+                                      todo.status.toString().split('.').last,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Created:',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    createdFormatted,
+                                    style: TextStyle(color: Colors.grey[700]),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Updated:',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    updatedFormatted,
+                                    style: TextStyle(color: Colors.grey[700]),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(todo.description),
-                          const SizedBox(height: 8),
-                          Text('Status: ${todo.status}'),
-                          Text('Created: $createdFormatted'),
-                          Text('Updated: $updatedFormatted'),
-                        ],
-                      ),
+                        ),
+                        Expanded(
+                          flex:
+                              1, // Adjusted flex to make the IconButton take up less space
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditTodoPage(todo: todo),
+                                ),
+                              ).then((value) {
+                                if (value == true) {
+                                  setState(() {
+                                    _todos = fetchTodos();
+                                  });
+                                }
+                              });
+                            },
+                            icon: const Icon(Icons.edit),
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 );
