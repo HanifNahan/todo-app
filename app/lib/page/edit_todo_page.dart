@@ -158,19 +158,32 @@ class _EditTodoPageState extends State<EditTodoPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  DropdownButton<TodoStatus>(
-                    value: _selectedStatus,
-                    onChanged: (newValue) {
-                      setState(() {
-                        _selectedStatus = newValue!;
-                      });
-                    },
-                    items: TodoStatus.values.map((status) {
-                      return DropdownMenuItem<TodoStatus>(
-                        value: status,
-                        child: Text(status.toString().split('.').last),
-                      );
-                    }).toList(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButton<TodoStatus>(
+                      value: _selectedStatus,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedStatus = newValue!;
+                        });
+                      },
+                      underline: Container(),
+                      icon: const Icon(Icons.arrow_drop_down),
+                      style: const TextStyle(color: Colors.black),
+                      items: TodoStatus.values.map((status) {
+                        return DropdownMenuItem<TodoStatus>(
+                          value: status,
+                          child: Text(
+                            status.toString().split('.').last,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ],
               ),
