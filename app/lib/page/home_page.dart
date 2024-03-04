@@ -1,10 +1,21 @@
-import 'package:app/page/add_todo_page.dart';
-import 'package:app/page/edit_todo_page.dart';
-import 'package:app/component/todo.dart';
-import 'package:app/support/api.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+/*
+ * File: home_page.dart
+ * Description: This file contains the HomePage widget, which displays the list of todos
+ * fetched from the API and allows users to add new todos or edit existing ones.
+ */
 
+import 'package:app/component/todo.dart'; // Importing the Todo class.
+import 'package:app/page/add_todo_page.dart'; // Importing the AddTodoPage widget.
+import 'package:app/page/edit_todo_page.dart'; // Importing the EditTodoPage widget.
+import 'package:app/support/api.dart'; // Importing the API class for making HTTP requests.
+import 'package:flutter/material.dart'; // Importing Flutter Material library.
+import 'package:intl/intl.dart'; // Importing the intl package for date formatting.
+
+/*
+ * Class: HomePage
+ * Description: This class represents the main page of the application where the list of todos is displayed.
+ * It fetches todos from the API, displays them in a ListView, and allows users to add new todos or edit existing ones.
+ */
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -12,18 +23,29 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+/*
+ * Class: _HomePageState
+ * Description: This class represents the state of the HomePage widget.
+ */
 class _HomePageState extends State<HomePage> {
-  late Future<List<Todo>> _todos;
+  late Future<List<Todo>>
+      _todos; // Future representing the list of todos fetched from the API.
 
   @override
   void initState() {
     super.initState();
-    _todos = fetchTodos();
+    _todos = fetchTodos(); // Fetching todos when the widget initializes.
   }
 
+  /*
+   * Function: fetchTodos
+   * Description: This function fetches the list of todos from the API.
+   * Returns: A Future containing a list of todos.
+   */
   Future<List<Todo>> fetchTodos() async {
     try {
-      final response = await API().get('todos/');
+      final response =
+          await API().get('todos/'); // Making a GET request to fetch todos.
       if (response['status']) {
         final List<dynamic> jsonData = response['data'];
         return jsonData
@@ -35,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                   created: DateTime.parse(json['created']),
                   updated: DateTime.parse(json['updated']),
                 ))
-            .toList();
+            .toList(); // Mapping JSON data to Todo objects.
       } else {
         throw Exception('Failed to load todos');
       }
@@ -48,16 +70,19 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo List'),
+        title: const Text('Todo List'), // Setting the title of the app bar.
       ),
       body: FutureBuilder<List<Todo>>(
         future: _todos,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child:
+                    CircularProgressIndicator()); // Displaying a loading indicator while fetching todos.
           } else if (snapshot.hasError) {
             return Center(
-              child: Text('Error: ${snapshot.error}'),
+              child: Text(
+                  'Error: ${snapshot.error}'), // Displaying an error message if fetching fails.
             );
           } else {
             final todos = snapshot.data!;
@@ -65,10 +90,12 @@ class _HomePageState extends State<HomePage> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
-                final createdFormatted =
-                    DateFormat('MMM dd, yyyy').add_jm().format(todo.created);
-                final updatedFormatted =
-                    DateFormat('MMM dd, yyyy').add_jm().format(todo.updated);
+                final createdFormatted = DateFormat('MMM dd, yyyy')
+                    .add_jm()
+                    .format(todo.created); // Formatting the created date.
+                final updatedFormatted = DateFormat('MMM dd, yyyy')
+                    .add_jm()
+                    .format(todo.updated); // Formatting the updated date.
                 return Card(
                   elevation: 4,
                   margin: const EdgeInsets.all(8),
@@ -173,7 +200,8 @@ class _HomePageState extends State<HomePage> {
                                 }
                               });
                             },
-                            icon: const Icon(Icons.edit),
+                            icon: const Icon(
+                                Icons.edit), // Displaying an edit icon.
                             color: Colors.blue,
                           ),
                         ),
@@ -190,7 +218,9 @@ class _HomePageState extends State<HomePage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddTodoPage()),
+            MaterialPageRoute(
+                builder: (context) =>
+                    const AddTodoPage()), // Navigating to the AddTodoPage when the FloatingActionButton is pressed.
           ).then((value) {
             if (value == true) {
               setState(() {
@@ -199,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             }
           });
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add), // Displaying a plus icon.
       ),
     );
   }

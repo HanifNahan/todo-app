@@ -13,6 +13,9 @@ class Todo(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
+        """
+        Return a string representation of the object.
+        """
         return self.title
     
     class Meta:

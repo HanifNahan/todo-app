@@ -1,21 +1,36 @@
-import 'package:app/component/button/button_primary.dart';
-import 'package:app/page/add_todo_page.dart';
-import 'package:app/component/todo.dart';
-import 'package:app/support/api.dart';
-import 'package:flutter/material.dart';
+/*
+ * File: edit_todo_page.dart
+ * Description: This file contains the EditTodoPage widget, which allows users to edit existing todos.
+ */
 
+import 'package:app/component/button/button_primary.dart'; // Importing the ButtonPrimary widget.
+import 'package:app/component/todo.dart'; // Importing the Todo class.
+import 'package:app/page/add_todo_page.dart';
+import 'package:app/support/api.dart'; // Importing the API class for making HTTP requests.
+import 'package:flutter/material.dart'; // Importing Flutter Material library.
+
+/*
+ * Class: EditTodoPage
+ * Description: This class represents the page where users can edit existing todos.
+ */
 class EditTodoPage extends StatefulWidget {
-  final Todo todo;
+  final Todo todo; // The todo object to be edited.
   const EditTodoPage({Key? key, required this.todo}) : super(key: key);
 
   @override
   State<EditTodoPage> createState() => _EditTodoPageState();
 }
 
+/*
+ * Class: _EditTodoPageState
+ * Description: This class represents the state of the EditTodoPage widget.
+ */
 class _EditTodoPageState extends State<EditTodoPage> {
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TodoStatus _selectedStatus;
+  late TextEditingController
+      _titleController; // Controller for the title text field.
+  late TextEditingController
+      _descriptionController; // Controller for the description text field.
+  late TodoStatus _selectedStatus; // The selected status of the todo.
 
   @override
   void initState() {
@@ -33,6 +48,13 @@ class _EditTodoPageState extends State<EditTodoPage> {
     super.dispose();
   }
 
+  /*
+   * Function: _getStatusFromString
+   * Description: Helper function to convert a status string to TodoStatus enum.
+   * Parameters:
+   *   - statusString: The status string to be converted.
+   * Returns: The corresponding TodoStatus enum.
+   */
   TodoStatus _getStatusFromString(String statusString) {
     switch (statusString.toLowerCase()) {
       case 'todo':
@@ -44,6 +66,10 @@ class _EditTodoPageState extends State<EditTodoPage> {
     }
   }
 
+  /*
+   * Function: _updateTodo
+   * Description: Function to update the todo on the server.
+   */
   Future<void> _updateTodo() async {
     try {
       final String title = _titleController.text.trim();
@@ -70,13 +96,17 @@ class _EditTodoPageState extends State<EditTodoPage> {
       if (response['status']) {
         back();
       } else {
-        _showSnackBar('Failed to create todo: ${response['data'].toString()}');
+        _showSnackBar('Failed to update todo: ${response['data'].toString()}');
       }
     } catch (e) {
-      _showSnackBar('Failed to create todo: ${e.toString()}');
+      _showSnackBar('Failed to update todo: ${e.toString()}');
     }
   }
 
+  /*
+   * Function: _deleteTodo
+   * Description: Function to delete the todo from the server.
+   */
   Future<void> _deleteTodo() async {
     try {
       final response = await API().delete('todos/${widget.todo.id}/delete/');
@@ -84,17 +114,27 @@ class _EditTodoPageState extends State<EditTodoPage> {
       if (response['status']) {
         back();
       } else {
-        _showSnackBar('Failed to create todo');
+        _showSnackBar('Failed to delete todo');
       }
     } catch (e) {
-      _showSnackBar('Failed to create todo: ${e.toString()}');
+      _showSnackBar('Failed to delete todo: ${e.toString()}');
     }
   }
 
+  /*
+   * Function: back
+   * Description: Function to navigate back to the previous screen.
+   */
   void back() {
     Navigator.pop(context, true);
   }
 
+  /*
+   * Function: _showSnackBar
+   * Description: Function to display a SnackBar with the given message.
+   * Parameters:
+   *   - message: The message to be displayed in the SnackBar.
+   */
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

@@ -1,13 +1,26 @@
-import 'package:app/component/button/button_primary.dart';
-import 'package:app/component/text_input.dart';
-import 'package:app/support/api.dart';
-import 'package:flutter/material.dart';
+/*
+ * File: add_todo_page.dart
+ * Description: This file contains the AddTodoPage widget, which allows users to add new todos.
+ */
 
+import 'package:app/component/button/button_primary.dart'; // Importing the ButtonPrimary widget.
+import 'package:app/component/text_input.dart'; // Importing the CustomInputField widget.
+import 'package:app/support/api.dart'; // Importing the API class for making HTTP requests.
+import 'package:flutter/material.dart'; // Importing Flutter Material library.
+
+/*
+ * Enum: TodoStatus
+ * Description: Enumeration representing the status of a todo.
+ */
 enum TodoStatus {
   todo,
   completed,
 }
 
+/*
+ * Class: AddTodoPage
+ * Description: This class represents the page where users can add new todos.
+ */
 class AddTodoPage extends StatefulWidget {
   const AddTodoPage({Key? key}) : super(key: key);
 
@@ -15,11 +28,21 @@ class AddTodoPage extends StatefulWidget {
   State<AddTodoPage> createState() => _AddTodoPageState();
 }
 
+/*
+ * Class: _AddTodoPageState
+ * Description: This class represents the state of the AddTodoPage widget.
+ */
 class _AddTodoPageState extends State<AddTodoPage> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
-  TodoStatus selectedStatus = TodoStatus.todo;
+  final TextEditingController titleController =
+      TextEditingController(); // Controller for the todo title text field.
+  final TextEditingController descriptionController =
+      TextEditingController(); // Controller for the todo description text field.
+  TodoStatus selectedStatus = TodoStatus.todo; // Selected status for the todo.
 
+  /*
+   * Function: _createTodo
+   * Description: This function creates a new todo based on user input.
+   */
   Future<void> _createTodo() async {
     try {
       final String title = titleController.text.trim();
@@ -40,9 +63,10 @@ class _AddTodoPageState extends State<AddTodoPage> {
         'status': selectedStatus.toString().split('.').last,
       };
 
-      final response = await API().post('todos/create/', todoData);
+      final response = await API().post('todos/create/',
+          todoData); // Making a POST request to create a new todo.
       if (response['status']) {
-        back();
+        back(); // Navigating back to the previous page after successful creation.
       } else {
         _showSnackBar('Failed to create todo: ${response['data'].toString()}');
       }
@@ -51,10 +75,20 @@ class _AddTodoPageState extends State<AddTodoPage> {
     }
   }
 
+  /*
+   * Function: back
+   * Description: This function navigates back to the previous page.
+   */
   void back() {
     Navigator.pop(context, true);
   }
 
+  /*
+   * Function: _showSnackBar
+   * Description: This function displays a snack bar with the given message.
+   * Parameters:
+   *   - message: The message to be displayed in the snack bar.
+   */
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -67,7 +101,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Todo'),
+        title: const Text('Add Todo'), // Setting the title of the app bar.
       ),
       body: Column(
         children: [
@@ -88,7 +122,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                   CustomInputField(
                     hintText: 'Enter title',
                     controller: titleController,
-                  ),
+                  ), // Text field for entering the todo title.
                   const SizedBox(height: 16),
                   const Text(
                     'Description',
@@ -102,7 +136,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                     hintText: 'Enter description',
                     isMultiline: true,
                     controller: descriptionController,
-                  ),
+                  ), // Text field for entering the todo description.
                   const SizedBox(height: 16),
                   const Text(
                     'Status',
@@ -137,7 +171,7 @@ class _AddTodoPageState extends State<AddTodoPage> {
                           ),
                         );
                       }).toList(),
-                    ),
+                    ), // Dropdown button for selecting the todo status.
                   ),
                 ],
               ),
@@ -147,9 +181,9 @@ class _AddTodoPageState extends State<AddTodoPage> {
             padding: const EdgeInsets.all(16),
             child: ButtonPrimary(
               onPressed: () {
-                _createTodo();
+                _createTodo(); // Handling the button press to create the todo.
               },
-              child: const Text('Save Todo'),
+              child: const Text('Save Todo'), // Text displayed on the button.
             ),
           ),
         ],
