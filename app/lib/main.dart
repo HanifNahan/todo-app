@@ -6,8 +6,10 @@
 
 import 'package:app/page/home_page.dart'; // Importing the home page widget.
 import 'package:flutter/material.dart'; // Importing Flutter Material library.
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+void main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp()); // Running the Flutter application.
 }
 

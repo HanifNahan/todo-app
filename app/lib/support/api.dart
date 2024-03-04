@@ -6,13 +6,14 @@
 import 'dart:convert'; // Importing the dart:convert library for JSON encoding and decoding.
 import 'package:http/http.dart'
     as http; // Importing the http library for making HTTP requests.
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /*
  * Class: API
  * Description: This class provides methods for making HTTP requests to an API.
  */
 class API {
-  static String apiUrl = 'http://127.0.0.1:8000/'; // Base URL of the API.
+  static String apiUrl = dotenv.get('API_URL'); // Base URL of the API.
 
   /*
    * Function: get
